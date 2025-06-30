@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EPF Interest Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      padding: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="number"] {
+      width: 200px;
+      margin-bottom: 10px;
+      padding: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+    #contributions input {
+      width: 180px;
+    }
+    .result {
+      background: #fff;
+      border-left: 5px solid #2d89ef;
+      padding: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>EPF Interest Calculator</h2>
+
+  <label>Existing Balance (before April):</label><br>
+  <input type="number" id="existingBalance" placeholder="e.g. 60300"><br>
+
+  <label>Annual Interest Rate (%):</label><br>
+  <input type="number" step="0.01" id="interestRate" placeholder="e.g. 8.25"><br>
+
+  <label>Number of Monthly Contributions (1-12):</label><br>
+  <input type="number" id="numMonths" min="1" max="12" placeholder="e.g. 12"><br>
+
+  <button onclick="generateContributionInputs()">Add Monthly Contribution Inputs</button>
+  
+  <div id="contributions"></div>
+
+  <button onclick="calculateInterest()">Calculate Interest</button>
+
+  <div id="output" class="result"></div>
+
+  <script>
+    function generateContributionInputs() {
+      const num = parseInt(document.getElementById("numMonths").value);
+      const div = document.getElementById("contributions");
+      div.innerHTML = '';
+      for (let i = 1; i <= num; i++) {
+        div.innerHTML += `
+          <label>Month ${i} Contribution:</label>
+          <input type="number" id="contrib${i}" placeholder="e.g. 2520"><br>
+        `;
+      }
+    }
+
+    function calculateInterest() {
+      const existing = parseFloat(document.getElementById("existingBalance").value) || 0;
+      const rate = parseFloat(document.getElementById("interestRate").value) || 0;
+      const numMonths = parseInt(document.getElementById("numMonths").value) || 0;
+
+      const monthlyRate = rate / 1200;
+      let totalInterest = 0;
+      let log = '';
+
+      // Interest on existing balance
+      const interestOnExisting = existing * 12 * monthlyRate;
+      totalInterest += interestOnExisting;
+      log += `Interest on existing balance ₹${existing} for 12 months: ₹${interestOnExisting.toFixed(2)}<br>`;
+      log += `Total interest after existing balance: ₹${totalInterest.toFixed(2)}<hr>`;
+
+      for (let i = 1; i <= numMonths; i++) {
+        const amount = parseFloat(document.getElementById(`contrib${i}`).value) || 0;
+        const eligibleMonths = 12 - i;
+        const interest = amount * eligibleMonths * monthlyRate;
+        const prevTotal = totalInterest;
+        totalInterest += interest;
+
+        log += `<strong>Month ${i}</strong><br>`;
+        log += `&nbsp;&nbsp;- Contribution: ₹${amount}<br>`;
+        log += `&nbsp;&nbsp;- Eligible months: ${eligibleMonths}<br>`;
+        log += `&nbsp;&nbsp;- Interest this month: ₹${interest.toFixed(2)}<br>`;
+        log += `&nbsp;&nbsp;- Previous total interest: ₹${prevTotal.toFixed(2)}<br>`;
+        log += `&nbsp;&nbsp;- Updated total interest: ₹${totalInterest.toFixed(2)}<hr>`;
+      }
+
+      log += `<h3>🎉 Final Total Interest: ₹${totalInterest.toFixed(2)}</h3>`;
+      document.getElementById("output").innerHTML = log;
+    }
+  </script>
+</body>
+</html>
