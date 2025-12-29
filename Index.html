@@ -87,7 +87,7 @@
 
       for (let i = 1; i <= numMonths; i++) {
         const amount = parseFloat(document.getElementById(`contrib${i}`).value) || 0;
-        const eligibleMonths = 12 - i;
+        const eligibleMonths = 12 - i + 1;
         const interest = amount * eligibleMonths * monthlyRate;
         const prevTotal = totalInterest;
         totalInterest += interest;
